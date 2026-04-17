@@ -1,0 +1,1052 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --z50: #fafafa; --z100: #f4f4f5; --z200: #e4e4e7; --z300: #d4d4d8;
+  --z400: #a1a1aa; --z500: #71717a; --z600: #52525b; --z700: #3f3f46;
+  --z800: #27272a; --z900: #18181b; --z950: #09090b;
+  --s50: #f8fafc; --s100: #f1f5f9; --s800: #1e293b; --s900: #0f172a; --s950: #020617;
+  --amber: #f59e0b; --amber-d: #92400e; --amber-l: #fef3c7;
+  --red: #ef4444; --red-d: #7f1d1d; --red-l: #fee2e2;
+  --green: #10b981; --green-d: #064e3b; --green-l: #d1fae5;
+  --blue: #3b82f6;
+  --font-main: 'Sora', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --bg: #09090b;
+  --surface: #18181b;
+  --surface2: #27272a;
+  --surface3: #3f3f46;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f4f4f5;
+  --text2: #a1a1aa;
+  --text3: #71717a;
+}
+
+body { font-family: var(--font-main); background: var(--bg); color: var(--text); }
+
+.shell {
+  width: 100%;
+  min-height: 640px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.logo-icon {
+  width: 22px; height: 22px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: var(--surface3);
+  color: var(--text2);
+  font-family: var(--font-mono);
+}
+
+.btn-new {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  background: rgba(59,130,246,0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59,130,246,0.3);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font-main);
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-new:hover { background: rgba(59,130,246,0.25); border-color: rgba(59,130,246,0.5); }
+
+.tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.tab {
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 10px 14px;
+  color: var(--text3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  letter-spacing: 0.01em;
+  user-select: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.tab.active { color: var(--text); border-color: #3b82f6; }
+.tab-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--amber);
+}
+
+.body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; flex: 1; }
+
+.section-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.card {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 13px 14px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.card.state-pending {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.card.state-active {
+  background: var(--surface);
+  border-color: rgba(59,130,246,0.3);
+  box-shadow: 0 0 0 1px rgba(59,130,246,0.08) inset;
+}
+
+.card.state-verifying {
+  background: var(--surface);
+  border-color: rgba(245,158,11,0.35);
+  box-shadow: 0 0 0 1px rgba(245,158,11,0.08) inset;
+}
+
+.card.state-urgent {
+  border-color: rgba(239,68,68,0.5);
+  animation: pulse-red 2s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.0); }
+  50% { box-shadow: 0 0 8px 2px rgba(239,68,68,0.2); }
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.state-pill {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.pill-pending { background: rgba(113,113,122,0.2); color: var(--z400); border: 1px solid rgba(113,113,122,0.2); }
+.pill-active { background: rgba(59,130,246,0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+.pill-verifying { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+.pill-done { background: rgba(16,185,129,0.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.2); }
+.pill-urgent { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+
+.card-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+}
+
+.meta-icon { font-size: 10px; opacity: 0.6; }
+
+.progress-bar-wrap {
+  margin: 10px 0 6px;
+  height: 3px;
+  background: var(--surface3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: width 0.5s ease;
+}
+
+.timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.timer {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: -0.03em;
+}
+
+.card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 11px;
+  align-items: center;
+}
+
+.btn {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text2);
+  font-family: var(--font-main);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn:hover { background: var(--surface3); color: var(--text); }
+
+.btn-primary {
+  background: rgba(59,130,246,0.15);
+  color: #93c5fd;
+  border-color: rgba(59,130,246,0.3);
+}
+.btn-primary:hover { background: rgba(59,130,246,0.25); }
+
+.btn-verify {
+  background: rgba(245,158,11,0.12);
+  color: #fcd34d;
+  border-color: rgba(245,158,11,0.25);
+}
+.btn-verify:hover { background: rgba(245,158,11,0.2); }
+
+.btn-accept {
+  background: rgba(16,185,129,0.12);
+  color: #6ee7b7;
+  border-color: rgba(16,185,129,0.2);
+}
+.btn-accept:hover { background: rgba(16,185,129,0.2); }
+
+.btn-danger {
+  background: rgba(239,68,68,0.1);
+  color: #fca5a5;
+  border-color: rgba(239,68,68,0.2);
+}
+.btn-danger:hover { background: rgba(239,68,68,0.18); }
+
+.glass-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+}
+
+.assignee-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.avatar {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  font-size: 8px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.av-blue { background: rgba(59,130,246,0.2); color: #93c5fd; }
+.av-purple { background: rgba(139,92,246,0.2); color: #c4b5fd; }
+.av-green { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+
+.snooze-wrap { position: relative; }
+
+.snooze-dropdown {
+  position: absolute;
+  top: 32px; left: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  z-index: 50;
+  min-width: 170px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.snooze-opt {
+  padding: 8px 12px;
+  font-size: 11.5px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  font-family: var(--font-main);
+  display: flex; align-items: center; gap: 6px;
+}
+.snooze-opt:hover { background: var(--surface3); color: var(--text); }
+
+.snooze-why {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+
+.snooze-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 5px;
+  color: var(--text);
+  font-size: 11px;
+  padding: 5px 8px;
+  font-family: var(--font-main);
+  outline: none;
+}
+.snooze-input::placeholder { color: var(--text3); }
+.snooze-input:focus { border-color: rgba(59,130,246,0.4); }
+
+.divider { height: 1px; background: var(--border); margin: 4px 0; }
+
+.ledger {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.ledger-header {
+  display: grid;
+  grid-template-columns: 1fr 90px 80px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-family: var(--font-mono);
+}
+
+.ledger-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 80px;
+  padding: 8px 14px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.ledger-row:last-child { border-bottom: none; }
+.ledger-row:hover { background: var(--surface2); }
+
+.ledger-task {
+  font-size: 11.5px;
+  color: var(--text);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.ghost-icon {
+  font-size: 11px;
+  opacity: 0.35;
+}
+
+.ledger-status {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--text3);
+}
+
+.ledger-time {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text3);
+  text-align: right;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+  animation: fade-in 0.15s ease;
+}
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 20px;
+  width: 320px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  animation: slide-up 0.18s ease;
+}
+
+@keyframes slide-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.modal-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 7px;
+}
+
+.modal-sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-bottom: 16px;
+}
+
+.field-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 5px;
+  font-family: var(--font-mono);
+}
+
+.field-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 8px 10px;
+  font-family: var(--font-main);
+  outline: none;
+  margin-bottom: 12px;
+  transition: border-color 0.15s;
+}
+.field-input:focus { border-color: rgba(59,130,246,0.45); }
+.field-input::placeholder { color: var(--text3); }
+
+.field-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+
+.deadline-toggle {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text3);
+  cursor: pointer;
+  font-family: var(--font-main);
+  transition: all 0.15s;
+}
+.deadline-toggle.active { background: rgba(245,158,11,0.12); color: #fcd34d; border-color: rgba(245,158,11,0.25); }
+
+.assignee-select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  color: var(--text);
+  font-size: 12px;
+  padding: 8px 10px;
+  font-family: var(--font-main);
+  outline: none;
+  margin-bottom: 12px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.btn-send {
+  width: 100%;
+  padding: 9px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-main);
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s, transform 0.1s;
+  margin-top: 4px;
+}
+.btn-send:hover { opacity: 0.88; transform: scale(0.99); }
+.btn-send:active { transform: scale(0.97); }
+
+.soft-deadline-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(245,158,11,0.1);
+  color: #fcd34d;
+  border: 1px solid rgba(245,158,11,0.2);
+  margin-top: 3px;
+}
+
+.tag-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+
+.state-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.flow-step {
+  display: flex; align-items: center; gap: 0; flex-shrink: 0;
+}
+
+.flow-node {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--surface2);
+  color: var(--text3);
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.flow-node.current {
+  background: rgba(59,130,246,0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59,130,246,0.3);
+}
+
+.flow-arrow {
+  font-size: 10px;
+  color: var(--text3);
+  padding: 0 5px;
+  opacity: 0.4;
+}
+
+.notification-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  position: absolute;
+  top: 12px; right: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text3);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: flex; flex-direction: column; gap: 10px; }
+</style>
+
+<div class="shell" id="app">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🤝</div>
+      Handshake
+    </div>
+    <div class="header-actions">
+      <span class="badge" id="live-time">--:--</span>
+      <button class="btn-new" onclick="openModal()">+ New</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('mine', this)">Mine <span class="tab-dot"></span></div>
+    <div class="tab" onclick="switchTab('incoming', this)">Incoming</div>
+    <div class="tab" onclick="switchTab('ledger', this)">Ledger</div>
+  </div>
+
+  <div class="body">
+
+    <div class="tab-content active" id="tab-mine">
+      <div class="state-flow">
+        <div class="flow-step"><span class="flow-node">Proposed</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="flow-node current" id="flow-accepted">Accepted</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="flow-node" id="flow-verifying">Verifying</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step"><span class="flow-node" id="flow-done">Done</span></div>
+      </div>
+
+      <div class="section-label">Active commitments</div>
+
+      <div class="card state-active" id="card-active">
+        <div class="glass-overlay"></div>
+        <div class="card-top">
+          <div>
+            <div class="card-title">Refactor auth middleware & add rate limiting</div>
+            <div class="card-meta" style="margin-top:6px;">
+              <div class="meta-item">
+                <div class="avatar av-blue">SR</div>
+                <span>Suresh R.</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">◷</span>
+                <span id="deadline-label">Due in</span>
+              </div>
+            </div>
+          </div>
+          <span class="state-pill pill-active">Active</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-fill" style="width: 62%"></div>
+        </div>
+        <div class="timer-row">
+          <span class="timer" id="countdown">14:22:08</span>
+          <span style="font-size:10px; color:var(--text3); font-family:var(--font-mono);">62% elapsed</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-verify" onclick="advanceToVerify()">✓ Mark Done</button>
+          <div class="snooze-wrap" id="snooze-wrap-1">
+            <button class="btn" onclick="toggleSnooze('snooze-drop-1')">⏸ Snooze</button>
+            <div class="snooze-dropdown" id="snooze-drop-1" style="display:none;">
+              <div class="snooze-opt" onclick="pickSnooze('4h', 'snooze-drop-1')">⏱ Snooze 4h</div>
+              <div class="snooze-opt" onclick="pickSnooze('24h', 'snooze-drop-1')">🌙 Snooze 24h</div>
+              <div class="divider"></div>
+              <div class="snooze-opt" onclick="pickSnooze('renegotiate', 'snooze-drop-1')">🔁 Renegotiate</div>
+              <div class="snooze-why" id="snooze-why-1" style="display:none;">
+                <input class="snooze-input" placeholder="Why? e.g. In a fire drill" id="snooze-reason-1" />
+                <button class="btn btn-primary" style="width:100%;margin-top:6px;justify-content:center;" onclick="submitSnooze('snooze-drop-1','snooze-reason-1')">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card state-verifying" id="card-verifying" style="display:none;">
+        <div class="glass-overlay"></div>
+        <div class="notification-dot"></div>
+        <div class="card-top">
+          <div>
+            <div class="card-title">Refactor auth middleware & add rate limiting</div>
+            <div class="card-meta" style="margin-top:6px;">
+              <div class="meta-item">
+                <div class="avatar av-blue">SR</div>
+                <span>Suresh R.</span>
+              </div>
+              <div class="meta-item" style="color: #fcd34d;">
+                <span>⚠ Awaiting your review</span>
+              </div>
+            </div>
+          </div>
+          <span class="state-pill pill-verifying">Verifying</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-verify" onclick="verifyDone()">✓ Verify &amp; Close</button>
+          <button class="btn btn-danger" onclick="rejectWork()">✗ Request Revision</button>
+        </div>
+        <div style="margin-top:8px; padding:8px 10px; background:var(--surface2); border-radius:6px; border: 1px solid var(--border);">
+          <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono); margin-bottom:4px;">WORK NOTE FROM ASSIGNEE</div>
+          <div style="font-size:11.5px; color:var(--text2); line-height:1.5;">Auth refactor complete. Rate limiter is on redis with a 100req/min cap per user. Tests passing.</div>
+        </div>
+      </div>
+
+      <div class="card" id="card-done" style="display:none; border-color:rgba(16,185,129,0.2);">
+        <div class="card-top">
+          <div class="card-title" style="text-decoration: line-through; opacity:0.5;">Refactor auth middleware & add rate limiting</div>
+          <span class="state-pill pill-done">✓ Done</span>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item" style="color:#6ee7b7;">Verified & archived · just now</div>
+        </div>
+      </div>
+
+      <div class="card state-pending">
+        <div class="card-top">
+          <div>
+            <div class="card-title">Write onboarding flow spec for mobile v2</div>
+            <div class="card-meta" style="margin-top:6px;">
+              <div class="meta-item">
+                <div class="avatar av-purple">PT</div>
+                <span>Priya T.</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">◷</span>
+                <span>Waiting for accept</span>
+              </div>
+            </div>
+          </div>
+          <span class="state-pill pill-pending">Pending</span>
+        </div>
+        <div style="margin-top:3px;">
+          <span class="soft-deadline-tag"><span class="tag-dot"></span> Soft deadline · 72h</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn" onclick="alert('Reminder sent to Priya.')">↑ Nudge</button>
+          <button class="btn btn-danger" onclick="alert('Request withdrawn.')">✗ Withdraw</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-content" id="tab-incoming">
+      <div class="section-label">Requests to you</div>
+
+      <div class="card state-urgent">
+        <div class="card-top">
+          <div>
+            <div class="card-title">Review PR: caching layer for product search</div>
+            <div class="card-meta" style="margin-top:6px;">
+              <div class="meta-item">
+                <div class="avatar av-green">AK</div>
+                <span>Arjun K.</span>
+              </div>
+              <div class="meta-item" style="color:#fca5a5;">
+                <span>⏰ Overdue by 2h</span>
+              </div>
+            </div>
+          </div>
+          <span class="state-pill pill-urgent">Urgent</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-accept" onclick="acceptRequest(this)">✓ Accept</button>
+          <div class="snooze-wrap">
+            <button class="btn" onclick="toggleSnooze('snooze-drop-2')">⏸ Snooze</button>
+            <div class="snooze-dropdown" id="snooze-drop-2" style="display:none;">
+              <div class="snooze-opt" onclick="pickSnooze('4h', 'snooze-drop-2')">⏱ Snooze 4h</div>
+              <div class="snooze-opt" onclick="pickSnooze('24h', 'snooze-drop-2')">🌙 Snooze 24h</div>
+              <div class="divider"></div>
+              <div class="snooze-opt" onclick="pickSnooze('renegotiate', 'snooze-drop-2')">🔁 Renegotiate</div>
+              <div class="snooze-why" id="snooze-why-2" style="display:none;">
+                <input class="snooze-input" placeholder="Why? e.g. In sprint review" id="snooze-reason-2" />
+                <button class="btn btn-primary" style="width:100%;margin-top:6px;justify-content:center;" onclick="submitSnooze('snooze-drop-2','snooze-reason-2')">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card state-pending">
+        <div class="card-top">
+          <div>
+            <div class="card-title">Pair on payment gateway integration — 1h</div>
+            <div class="card-meta" style="margin-top:6px;">
+              <div class="meta-item">
+                <div class="avatar av-green">AK</div>
+                <span>Arjun K.</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">◷</span>
+                <span>Due tomorrow</span>
+              </div>
+            </div>
+          </div>
+          <span class="state-pill pill-pending">Pending</span>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-accept" onclick="acceptRequest(this)">✓ Accept</button>
+          <button class="btn btn-danger" onclick="declineRequest(this)">✗ Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-ledger">
+      <div class="section-label">Commitment ledger</div>
+      <div class="ledger">
+        <div class="ledger-header">
+          <span>Task</span>
+          <span>Status</span>
+          <span style="text-align:right;">Age</span>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-task">Auth middleware refactor</div>
+          <div class="ledger-status" style="color:#93c5fd;">Active</div>
+          <div class="ledger-time">1d 4h</div>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-task">Onboarding spec v2 <span class="ghost-icon">◈</span></div>
+          <div class="ledger-status">Pending</div>
+          <div class="ledger-time">3d 11h</div>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-task">DB index audit</div>
+          <div class="ledger-status" style="color:#6ee7b7;">Done</div>
+          <div class="ledger-time">6d</div>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-task">API docs update <span class="ghost-icon">◈</span></div>
+          <div class="ledger-status" style="color:#fcd34d;">Stale</div>
+          <div class="ledger-time">4d 2h</div>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-task">Load test staging env</div>
+          <div class="ledger-status" style="color:#fca5a5;">Overdue</div>
+          <div class="ledger-time">2d 7h</div>
+        </div>
+        <div class="ledger-row">
+          <div class="ledger-task">Review Arjun's PR</div>
+          <div class="ledger-status" style="color:#fcd34d;">Verifying</div>
+          <div class="ledger-time">0d 3h</div>
+        </div>
+      </div>
+      <div style="margin-top:6px; padding: 8px 10px; background:var(--surface); border-radius:8px; border:1px solid var(--border);">
+        <div style="font-size:10px; color:var(--text3); font-family:var(--font-mono); margin-bottom:4px;">◈ = GHOST (Undeclared + &gt;3 days) · Double-lock required to archive</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal" style="display:none;" onclick="closeModalBackdrop(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">🤝 New Handshake</div>
+    <div class="modal-sub">Create an accountability commitment with your lead</div>
+
+    <div class="field-label">Commitment</div>
+    <input class="field-input" placeholder="What are you committing to?" id="modal-title-input" value="" />
+
+    <div class="field-label">Assignee (Lead / Senior)</div>
+    <select class="field-input" id="modal-assignee" style="appearance:none; cursor:pointer;">
+      <option>Suresh R. — Tech Lead</option>
+      <option>Priya T. — Sr. Engineer</option>
+      <option>Arjun K. — EM</option>
+    </select>
+
+    <div class="field-label">Deadline</div>
+    <div class="field-row">
+      <input class="field-input" type="date" id="modal-date" style="flex:1; margin-bottom:0;" />
+      <button class="deadline-toggle" id="undeclared-btn" onclick="toggleUndeclared()">Undeclared</button>
+    </div>
+    <div id="soft-deadline-notice" style="display:none; margin-bottom:12px;">
+      <span class="soft-deadline-tag"><span class="tag-dot"></span> Soft deadline of 72h will be auto-applied</span>
+    </div>
+
+    <button class="btn-send" onclick="sendHandshake()">Send Handshake →</button>
+    <button class="btn" style="width:100%; justify-content:center; margin-top:7px;" onclick="closeModal()">Cancel</button>
+  </div>
+</div>
+
+<script>
+var countdown = 52928;
+var undeclared = false;
+
+function pad(n) { return n < 10 ? '0' + n : n; }
+
+function updateClock() {
+  var d = new Date();
+  document.getElementById('live-time').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
+function updateCountdown() {
+  if (countdown <= 0) { document.getElementById('countdown').textContent = '00:00:00'; return; }
+  countdown--;
+  var h = Math.floor(countdown / 3600);
+  var m = Math.floor((countdown % 3600) / 60);
+  var s = countdown % 60;
+  document.getElementById('countdown').textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+  var pct = Math.round((1 - countdown / 86400) * 100);
+  pct = Math.min(Math.max(pct, 0), 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+updateClock();
+setInterval(updateClock, 30000);
+setInterval(updateCountdown, 1000);
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function openModal() {
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+  undeclared = false;
+  document.getElementById('undeclared-btn').classList.remove('active');
+  document.getElementById('soft-deadline-notice').style.display = 'none';
+  document.getElementById('modal-date').disabled = false;
+}
+
+function closeModalBackdrop(e) { if (e.target === document.getElementById('modal')) closeModal(); }
+
+function toggleUndeclared() {
+  undeclared = !undeclared;
+  var btn = document.getElementById('undeclared-btn');
+  var dateInput = document.getElementById('modal-date');
+  var notice = document.getElementById('soft-deadline-notice');
+  if (undeclared) {
+    btn.classList.add('active');
+    dateInput.disabled = true;
+    dateInput.value = '';
+    notice.style.display = 'block';
+  } else {
+    btn.classList.remove('active');
+    dateInput.disabled = false;
+    notice.style.display = 'none';
+  }
+}
+
+function sendHandshake() {
+  var title = document.getElementById('modal-title-input').value.trim();
+  if (!title) { document.getElementById('modal-title-input').focus(); return; }
+  closeModal();
+  var feedback = document.createElement('div');
+  feedback.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27272a;color:#e4e4e7;font-size:12px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);z-index:999;animation:slide-up 0.2s ease;font-family:var(--font-main);';
+  feedback.textContent = '🤝 Handshake proposed — waiting for acceptance';
+  document.body.appendChild(feedback);
+  setTimeout(function() { feedback.remove(); }, 3000);
+}
+
+function toggleSnooze(id) {
+  var d = document.getElementById(id);
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+function pickSnooze(val, dropId) {
+  var whyMap = { '4h': 'snooze-why-1', '24h': 'snooze-why-1', 'renegotiate': 'snooze-why-1' };
+  var num = dropId === 'snooze-drop-2' ? '2' : '1';
+  document.getElementById('snooze-why-' + num).style.display = 'block';
+  document.getElementById('snooze-reason-' + num).placeholder = val === 'renegotiate' ? 'What needs to change?' : 'Why? e.g. In a fire drill';
+}
+
+function submitSnooze(dropId, reasonId) {
+  var reason = document.getElementById(reasonId).value.trim();
+  document.getElementById(dropId).style.display = 'none';
+  var num = dropId === 'snooze-drop-2' ? '2' : '1';
+  document.getElementById('snooze-why-' + num).style.display = 'none';
+  document.getElementById(reasonId).value = '';
+  var msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27272a;color:#fcd34d;font-size:12px;padding:8px 16px;border-radius:8px;border:1px solid rgba(245,158,11,0.2);z-index:999;font-family:var(--font-main);';
+  msg.textContent = '⏸ Snoozed. Reason logged.';
+  document.body.appendChild(msg);
+  setTimeout(function() { msg.remove(); }, 2500);
+}
+
+function advanceToVerify() {
+  document.getElementById('card-active').style.display = 'none';
+  document.getElementById('card-verifying').style.display = 'block';
+  document.getElementById('flow-accepted').classList.remove('current');
+  document.getElementById('flow-verifying').classList.add('current');
+}
+
+function verifyDone() {
+  document.getElementById('card-verifying').style.display = 'none';
+  document.getElementById('card-done').style.display = 'block';
+  document.getElementById('flow-verifying').classList.remove('current');
+  document.getElementById('flow-done').classList.add('current');
+}
+
+function rejectWork() {
+  document.getElementById('card-verifying').style.display = 'none';
+  document.getElementById('card-active').style.display = 'block';
+  document.getElementById('flow-verifying').classList.remove('current');
+  document.getElementById('flow-accepted').classList.add('current');
+  var msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27272a;color:#fca5a5;font-size:12px;padding:8px 16px;border-radius:8px;border:1px solid rgba(239,68,68,0.2);z-index:999;font-family:var(--font-main);';
+  msg.textContent = '✗ Revision requested — moved back to Active';
+  document.body.appendChild(msg);
+  setTimeout(function() { msg.remove(); }, 3000);
+}
+
+function acceptRequest(btn) {
+  var card = btn.closest('.card');
+  card.className = 'card state-active';
+  card.querySelector('.state-pill').className = 'state-pill pill-active';
+  card.querySelector('.state-pill').textContent = 'Active';
+  btn.closest('.card-actions').innerHTML = '<button class="btn btn-verify" onclick="alert(\'Marked done — sent for verification\')">✓ Mark Done</button>';
+  var msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#27272a;color:#6ee7b7;font-size:12px;padding:8px 16px;border-radius:8px;border:1px solid rgba(16,185,129,0.2);z-index:999;font-family:var(--font-main);';
+  msg.textContent = '✓ Handshake accepted — commitment active';
+  document.body.appendChild(msg);
+  setTimeout(function() { msg.remove(); }, 2500);
+}
+
+function declineRequest(btn) {
+  var card = btn.closest('.card');
+  card.style.opacity = '0';
+  card.style.transition = 'opacity 0.3s';
+  setTimeout(function() { card.remove(); }, 300);
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.snooze-wrap')) {
+    document.querySelectorAll('.snooze-dropdown').forEach(function(d) { d.style.display = 'none'; });
+  }
+});
+</script>
