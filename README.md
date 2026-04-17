@@ -1,8 +1,12 @@
+
 # 🤝 Handshake
 
-> **The "Double-Handshake" protocol for professional commitments.**
+> **A lightweight system for tracking real commitments between teammates.**
 
-Stop getting ghosted by your leads. **Handshake** is a minimalist browser extension that turns casual verbal agreements into tracked, verified commitments. It bridges the "accountability gap" between individual contributors and seniors with a simple, high-trust workflow.
+Not every task belongs in Jira.
+But some promises shouldn’t be forgotten.
+
+**Handshake** turns casual “I’ll do it” moments into clear, trackable commitments without adding process overhead.
 
 ![HandShake_mvp_dashboard](Screenshots/127-0-0-1-5500-handshake_mvp_dashboard-html.png)
 
@@ -10,60 +14,101 @@ Stop getting ghosted by your leads. **Handshake** is a minimalist browser extens
 
 ## ✨ The Problem
 
-In fast-paced corporate environments, seniors often suffer from **"Commitment Debt."** They agree to review a PR, fix a high-priority bug, or validate a build—then forget.
+Work doesn’t break because people are lazy.
+It breaks because  **small commitments slip through** .
 
-* **Jira** is too heavy for small promises.
-* **Slack** messages get buried in the scroll.
-* **Verbal agreements** have no paper trail.
+* “I’ll review that PR”
+* “I’ll send the file”
+* “I’ll check the logs”
 
-## 🚀 The Solution: The Double-Handshake
+These aren’t big enough for Jira.
+But they’re important enough to block progress.
 
-Handshake introduces a "Smart Contract" logic to everyday tasks:
+Current tools fail here:
 
-1. **Request:** Highlight any text (Jira, GitHub, Slack) to request a commitment.
-2. **Accept:** The Senior receives a nudge to accept or negotiate the timeline.
-3. **Finish:** Once the Senior marks it "Done," it enters  **Verification State** .
-4. **Verify:** The commitment is only closed when *you* manually verify the work.
+* **Jira** → too heavy for micro-tasks
+* **Slack/Teams** → messages get buried
+* **Reminders** → one-sided, no shared visibility
+
+Result:
+Work stalls, follow-ups feel awkward, and accountability becomes unclear.
+
+---
+
+## 🚀 The Solution: Handshake Protocol
+
+Handshake introduces a simple idea:
+
+> **If it matters, both sides acknowledge it.**
+
+A commitment only exists when it’s mutually accepted.
+
+### Flow:
+
+1. **Request**
+   Capture a commitment directly from your workflow (chat, PR, task).
+2. **Accept / Snooze**
+   The other person acknowledges or defers it with context.
+3. **Track**
+   The system quietly keeps it visible without spamming.
+4. **Done → Verify**
+   Completion is confirmed, not assumed.
+
+---
+
+## 🧠 What Makes It Different
+
+* **Built for micro-commitments**
+  Not tasks. Not tickets. Just the small things that actually block work.
+* **Two-sided accountability**
+  No silent reminders. Both people are aware.
+* **Zero awkward follow-ups**
+  The system nudges, not you.
+* **No process bloat**
+  Faster than creating a Jira ticket. Cleaner than Slack pings.
 
 ---
 
 ## 🛠 Features
 
-* **Vibe-Coded UI:** Minimalist, dark-mode first design that feels native to your dev tools.
-* **The Snooze Button:** A "socially acceptable" way for seniors to delay tasks with a reason, reducing friction.
-* **Undeclared Timelines:** Track tasks that don't have a hard date yet, preventing them from falling through the cracks.
-* **Escalating Nudges:** Gentle browser icons that turn into **Red Alerts** as deadlines approach.
-* **Privacy-First:** Designed for corporate environments. Data stays where it belongs.
+* **Minimal UI**
+  Fast, distraction-free interface designed for daily use
+* **Snooze with context**
+  Delay without ignoring. Keeps communication healthy
+* **Escalating nudges**
+  Subtle reminders that increase only when needed
+* **Undeclared timelines**
+  Track “soon” tasks without forcing deadlines
+* **Privacy-first design**
+  No unnecessary exposure of internal workflows
 
 ---
 
 ## 🏗 Installation (MVP)
 
-*Currently in Developer Preview.*
+*Developer Preview*
 
-1. Clone this repo.
-2. Run `npm install` and `npm run build`.
-3. Open Chrome/Edge/Brave and go to `chrome://extensions`.
-4. Enable  **Developer Mode** .
-5. Click **Load Unpacked** and select the `dist` folder.
+1. Clone the repository
+2. Run `npm install` and `npm run build`
+3. Open `chrome://extensions`
+4. Enable **Developer Mode**
+5. Click **Load Unpacked** → select `dist`
 
 ---
 
 ## 📊 Roadmap
 
-* [X] Phase 1: Minimalist Browser Extension (Current)
-* [ ] Phase 2: Slack/Teams Notification Bot
-* [ ] Phase 3: Analytical Dashboard (Commitment Reliability Scores)
-* [ ] Phase 4: Standalone SaaS Platform
+* [X] Phase 1: Browser Extension MVP
+* [ ] Phase 2: Slack / Teams integration
+* [ ] Phase 3: Lightweight team insights (commitment visibility, not surveillance)
+* [ ] Phase 4: Cross-tool “commitment layer” for teams
 
 ---
 
 ## 🤝 Contributing
 
-We believe in **upward accountability.** If you have ideas on how to make professional commitments more transparent without adding corporate "bloat," feel free to open an issue.
+If you care about improving **how teams actually coordinate work** without adding friction, open an issue or share your ideas.
 
 ---
 
-### *“Because a promise made in a PR comment is still a promise.”*
-
----
+### *“Not everything needs a ticket. But some things shouldn’t be forgotten.”*
