@@ -1,39 +1,39 @@
-import React, { useMemo } from 'react';
-import '../styles/Ledger.css';
+function ageLabel(createdAt) {
+  const diff = Date.now() - new Date(createdAt)
+  const hours = Math.floor(diff / 3600000)
+  if (hours < 24) return `${hours}h`
+  return `${Math.floor(hours / 24)}d ${hours % 24}h`
+}
 
-function Ledger({ handshakes }) {
-  const stats = useMemo(() => {
-    return {
-      total: handshakes.length,
-      pending: handshakes.filter((h) => h.status === 'pending').length,
-      completed: handshakes.filter((h) => h.status === 'completed').length,
-      inProgress: handshakes.filter((h) => h.status === 'in_progress').length,
-    };
-  }, [handshakes]);
+const STATE_COLOR = {
+  pending:   '#a1a1aa',
+  active:    '#93c5fd',
+  verifying: '#fcd34d',
+  done:      '#6ee7b7',
+  snoozed:   '#fcd34d',
+}
+
+export default function Ledger({ commitments }) {
+  if (!commitments.length) {
+    return <div className="empty-state">No commitments in the ledger yet.</div>
+  }
 
   return (
     <div className="ledger">
-      <h2>Ledger</h2>
-      <div className="stats-container">
-        <div className="stat-item">
-          <span className="stat-label">Total</span>
-          <span className="stat-value">{stats.total}</span>
-        </div>
-        <div className="stat-item pending">
-          <span className="stat-label">Pending</span>
-          <span className="stat-value">{stats.pending}</span>
-        </div>
-        <div className="stat-item in-progress">
-          <span className="stat-label">In Progress</span>
-          <span className="stat-value">{stats.inProgress}</span>
-        </div>
-        <div className="stat-item completed">
-          <span className="stat-label">Completed</span>
-          <span className="stat-value">{stats.completed}</span>
-        </div>
+      <div className="ledger-header">
+        <span>Task</span>
+        <span>Status</span>
+        <span style={{ textAlign: 'right' }}>Age</span>
       </div>
+      {commitments.map((c) => (
+        <div className="ledger-row" key={c.id}>
+          <div className="ledger-task">{c.title}</div>
+          <div className="ledger-status" style={{ color: STATE_COLOR[c.state] }}>
+            {c.state.charAt(0).toUpperCase() + c.state.slice(1)}
+          </div>
+          <div className="ledger-time">{ageLabel(c.created_at)}</div>
+        </div>
+      ))}
     </div>
-  );
+  )
 }
-
-export default Ledger;

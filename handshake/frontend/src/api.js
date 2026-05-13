@@ -1,59 +1,39 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// All requests go through the Vite proxy → FastAPI at localhost:8000
+const client = axios.create({ baseURL: '/api' })
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// Inject the current user header on every request
+// activeUserId is set by the user switcher in the UI
+let activeUserId = 'muzammil'
 
-// Handshake endpoints
-export const fetchHandshakes = async () => {
-  const response = await api.get('/handshakes');
-  return response.data;
-};
+export function setActiveUser(userId) {
+  activeUserId = userId
+}
 
-export const fetchHandshake = async (id) => {
-  const response = await api.get(`/handshakes/${id}`);
-  return response.data;
-};
+client.interceptors.request.use((config) => {
+  config.headers['X-User-Id'] = activeUserId
+  return config
+})
 
-export const createHandshake = async (data) => {
-  const response = await api.post('/handshakes', data);
-  return response.data;
-};
+// --- API functions ---
 
-export const updateHandshake = async (id, data) => {
-  const response = await api.put(`/handshakes/${id}`, data);
-  return response.data;
-};
+export const api = {
+  getUsers: () =>
+    client.get('/users').then((r) => r.data),
 
-export const deleteHandshake = async (id) => {
-  const response = await api.delete(`/handshakes/${id}`);
-  return response.data;
-};
+  getMine: () =>
+    client.get('/commitments/mine').then((r) => r.data),
 
-// Commitment endpoints
-export const fetchCommitments = async (handshakeId) => {
-  const response = await api.get(`/handshakes/${handshakeId}/commitments`);
-  return response.data;
-};
+  getIncoming: () =>
+    client.get('/commitments/incoming').then((r) => r.data),
 
-export const createCommitment = async (handshakeId, data) => {
-  const response = await api.post(`/handshakes/${handshakeId}/commitments`, data);
-  return response.data;
-};
+  getLedger: () =>
+    client.get('/commitments/ledger').then((r) => r.data),
 
-export const updateCommitment = async (handshakeId, commitmentId, data) => {
-  const response = await api.put(`/handshakes/${handshakeId}/commitments/${commitmentId}`, data);
-  return response.data;
-};
+  createCommitment: (payload) =>
+    client.post('/commitments', payload).then((r) => r.data),
 
-export const deleteCommitment = async (handshakeId, commitmentId) => {
-  const response = await api.delete(`/handshakes/${handshakeId}/commitments/${commitmentId}`);
-  return response.data;
-};
-
-export default api;
+  updateCommitment: (id, payload) =>
+    client.patch(`/commitments/${id}`, payload).then((r) => r.data),
+}
