@@ -1,0 +1,15 @@
+handshake/
+├── backend/
+│   ├── main.py          # FastAPI app + routes
+│   ├── models.py        # SQLAlchemy models
+│   ├── schemas.py       # Pydantic schemas
+│   └── database.py      # DB setup
+└── frontend/
+    ├── src/
+    │   ├── App.jsx
+    │   ├── components/
+    │   │   ├── CommitmentCard.jsx
+    │   │   ├── NewHandshakeModal.jsx
+    │   │   └── Ledger.jsx
+    │   └── api.js       # axios calls
+    └── package.json
