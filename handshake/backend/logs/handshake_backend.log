@@ -84,3 +84,60 @@
 2026-05-15 11:19:31 | INFO     | Incoming request POST /commitments
 2026-05-15 11:19:31 | INFO     | Completed POST /commitments with 201
 2026-05-15 11:19:31 | INFO     | 127.0.0.1:61466 - "POST /commitments HTTP/1.1" 201
+2026-05-15 11:26:11 | INFO     | Incoming request GET /commitments/mine
+2026-05-15 11:26:11 | INFO     | Incoming request GET /commitments/incoming
+2026-05-15 11:26:11 | INFO     | Incoming request GET /commitments/ledger
+2026-05-15 11:26:11 | INFO     | Incoming request GET /users
+2026-05-15 11:26:11 | INFO     | Completed GET /users with 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:55550 - "GET /users HTTP/1.1" 200
+2026-05-15 11:26:11 | INFO     | Incoming request GET /users
+2026-05-15 11:26:11 | INFO     | Completed GET /users with 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:55550 - "GET /users HTTP/1.1" 200
+2026-05-15 11:26:11 | INFO     | Completed GET /commitments/ledger with 200
+2026-05-15 11:26:11 | INFO     | Completed GET /commitments/incoming with 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:52738 - "GET /commitments/ledger HTTP/1.1" 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:59030 - "GET /commitments/incoming HTTP/1.1" 200
+2026-05-15 11:26:11 | INFO     | Incoming request GET /commitments/ledger
+2026-05-15 11:26:11 | INFO     | Incoming request GET /commitments/incoming
+2026-05-15 11:26:11 | INFO     | Completed GET /commitments/mine with 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:50378 - "GET /commitments/mine HTTP/1.1" 200
+2026-05-15 11:26:11 | INFO     | Incoming request GET /commitments/mine
+2026-05-15 11:26:11 | INFO     | Completed GET /commitments/incoming with 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:59030 - "GET /commitments/incoming HTTP/1.1" 200
+2026-05-15 11:26:11 | INFO     | Completed GET /commitments/ledger with 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:55550 - "GET /commitments/ledger HTTP/1.1" 200
+2026-05-15 11:26:11 | INFO     | Completed GET /commitments/mine with 200
+2026-05-15 11:26:11 | INFO     | 127.0.0.1:52738 - "GET /commitments/mine HTTP/1.1" 200
+2026-05-15 11:28:52 | INFO     | Incoming request GET /users
+2026-05-15 11:28:52 | INFO     | Shutting down
+2026-05-15 11:28:52 | INFO     | Completed GET /users with 200
+2026-05-15 11:28:52 | INFO     | 127.0.0.1:60915 - "GET /users HTTP/1.1" 200
+2026-05-15 11:28:52 | INFO     | Waiting for application shutdown.
+2026-05-15 11:28:52 | INFO     | Application shutdown complete.
+2026-05-15 11:28:53 | INFO     | Finished server process [24112]
+2026-05-15 11:29:01 | INFO     | Handshake backend startup
+2026-05-15 11:29:01 | INFO     | Application startup complete.
+2026-05-15 11:35:50 | INFO     | Incoming request GET /commitments/ledger
+2026-05-15 11:35:50 | INFO     | Incoming request GET /commitments/incoming
+2026-05-15 11:35:50 | INFO     | Incoming request GET /users
+2026-05-15 11:35:50 | INFO     | Incoming request GET /commitments/mine
+2026-05-15 11:35:50 | INFO     | Completed GET /users with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:50994 - "GET /users HTTP/1.1" 200
+2026-05-15 11:35:50 | INFO     | Incoming request GET /users
+2026-05-15 11:35:50 | INFO     | Completed GET /users with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:49364 - "GET /users HTTP/1.1" 200
+2026-05-15 11:35:50 | INFO     | Completed GET /commitments/incoming with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:50996 - "GET /commitments/incoming HTTP/1.1" 200
+2026-05-15 11:35:50 | INFO     | Completed GET /commitments/mine with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:50995 - "GET /commitments/mine HTTP/1.1" 200
+2026-05-15 11:35:50 | INFO     | Completed GET /commitments/ledger with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:50997 - "GET /commitments/ledger HTTP/1.1" 200
+2026-05-15 11:35:50 | INFO     | Incoming request GET /commitments/incoming
+2026-05-15 11:35:50 | INFO     | Completed GET /commitments/incoming with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:62818 - "GET /commitments/incoming HTTP/1.1" 200
+2026-05-15 11:35:50 | INFO     | Incoming request GET /commitments/mine
+2026-05-15 11:35:50 | INFO     | Incoming request GET /commitments/ledger
+2026-05-15 11:35:50 | INFO     | Completed GET /commitments/ledger with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:64584 - "GET /commitments/ledger HTTP/1.1" 200
+2026-05-15 11:35:50 | INFO     | Completed GET /commitments/mine with 200
+2026-05-15 11:35:50 | INFO     | 127.0.0.1:64583 - "GET /commitments/mine HTTP/1.1" 200

@@ -1,227 +1,199 @@
 import { useState } from 'react'
 import { api } from '../api'
 
-// How long ago / how far ahead is a date?
-function timeLabel(dateStr) {
-  if (!dateStr) return 'Undeclared'
-  const diff = new Date(dateStr) - Date.now()
-  const hours = Math.round(diff / 3600000)
-  if (hours < 0) return `Overdue by ${Math.abs(hours)}h`
-  if (hours < 24) return `Due in ${hours}h`
-  return `Due in ${Math.ceil(hours / 24)}d`
+const STATE_META = {
+  pending: { label: 'Pending', tone: 'pending' },
+  active: { label: 'Active', tone: 'active' },
+  verifying: { label: 'Verifying', tone: 'verifying' },
+  done: { label: 'Done', tone: 'done' },
+  snoozed: { label: 'Snoozed', tone: 'snoozed' },
 }
 
-function isOverdue(dateStr) {
-  if (!dateStr) return false
-  return new Date(dateStr) < Date.now()
+function formatDeadline(deadline, isUndeclared) {
+  if (isUndeclared) return 'Soft 72h'
+  if (!deadline) return 'Undeclared'
+
+  const dueAt = new Date(deadline)
+  const diffMs = dueAt.getTime() - Date.now()
+  const absHours = Math.max(1, Math.round(Math.abs(diffMs) / 3600000))
+
+  if (diffMs < 0) return `Overdue ${absHours}h`
+  if (absHours < 24) return `Due ${absHours}h`
+  return `Due ${Math.ceil(absHours / 24)}d`
 }
 
-// Who is the other person in this commitment?
-function peerLabel(commitment, currentUserId, users) {
-  const peerId =
-    commitment.requester_id === currentUserId
-      ? commitment.assignee_id
-      : commitment.requester_id
-  const peer = users.find((u) => u.id === peerId)
-  return peer ? { name: peer.name, initials: peer.initials } : { name: peerId, initials: '?' }
+function formatDate(deadline) {
+  if (!deadline) return 'No hard date'
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(deadline))
 }
 
-const STATE_PILL = {
-  pending:   { label: 'Pending',   cls: 'pill-pending' },
-  active:    { label: 'Active',    cls: 'pill-active' },
-  verifying: { label: 'Verifying', cls: 'pill-verifying' },
-  done:      { label: '✓ Done',    cls: 'pill-done' },
-  snoozed:   { label: 'Snoozed',  cls: 'pill-snoozed' },
+function getPeer(commitment, currentUserId, usersById) {
+  const peerId = commitment.requester_id === currentUserId
+    ? commitment.assignee_id
+    : commitment.requester_id
+  return usersById[peerId] || { id: peerId, name: peerId, initials: peerId.slice(0, 2).toUpperCase() }
 }
 
-export default function CommitmentCard({ commitment, currentUserId, users, onUpdate }) {
-  const [snoozeOpen, setSnoozeOpen] = useState(false)
-  const [snoozeReason, setSnoozeReason] = useState('')
-  const [workNote, setWorkNote] = useState('')
+export default function CommitmentCard({ commitment, currentUserId, onUpdate, usersById }) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
   const [workNoteOpen, setWorkNoteOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [workNote, setWorkNote] = useState(commitment.work_note || '')
+  const [snoozeOpen, setSnoozeOpen] = useState(false)
+  const [snoozeReason, setSnoozeReason] = useState(commitment.snooze_reason || '')
 
   const isRequester = commitment.requester_id === currentUserId
   const isAssignee = commitment.assignee_id === currentUserId
-  const peer = peerLabel(commitment, currentUserId, users)
-  const overdue = isOverdue(commitment.deadline)
-  const pill = STATE_PILL[commitment.state] || { label: commitment.state, cls: 'pill-pending' }
+  const isParticipant = isRequester || isAssignee
+  const isOverdue = commitment.deadline
+    && new Date(commitment.deadline) < new Date()
+    && commitment.state !== 'done'
+  const urgentPending = isOverdue && commitment.state === 'pending'
+  const peer = getPeer(commitment, currentUserId, usersById)
+  const stateMeta = STATE_META[commitment.state] || { label: commitment.state, tone: 'pending' }
 
   async function transition(state, extra = {}) {
-    setLoading(true)
+    setBusy(true)
+    setError('')
     try {
       const updated = await api.updateCommitment(commitment.id, { state, ...extra })
       onUpdate(updated)
+      setWorkNoteOpen(false)
+      setSnoozeOpen(false)
+      setWorkNote(updated.work_note || '')
+      setSnoozeReason(updated.snooze_reason || '')
+    } catch (requestError) {
+      setError(requestError.response?.data?.detail || 'Action failed.')
     } finally {
-      setLoading(false)
+      setBusy(false)
     }
   }
 
-  async function submitSnooze() {
-    await transition('snoozed', { snooze_reason: snoozeReason })
-    setSnoozeOpen(false)
-    setSnoozeReason('')
+  function submitWorkNote(event) {
+    event.preventDefault()
+    transition('verifying', { work_note: workNote.trim() || null })
   }
 
-  async function submitWorkNote() {
-    await transition('verifying', { work_note: workNote })
-    setWorkNoteOpen(false)
-    setWorkNote('')
+  function submitSnooze(event) {
+    event.preventDefault()
+    transition('snoozed', { snooze_reason: snoozeReason.trim() || 'Snoozed without reason' })
   }
-
-  const cardClass = [
-    'card',
-    commitment.state === 'active' ? 'state-active' : '',
-    commitment.state === 'verifying' ? 'state-verifying' : '',
-    commitment.state === 'pending' ? 'state-pending' : '',
-    commitment.state === 'done' ? 'state-done' : '',
-    overdue && commitment.state === 'pending' ? 'state-urgent' : '',
-  ].filter(Boolean).join(' ')
 
   return (
-    <div className={cardClass}>
-      <div className="glass-overlay" />
-
-      {/* Header row */}
-      <div className="card-top">
-        <div style={{ flex: 1 }}>
-          <div className="card-title" style={commitment.state === 'done' ? { textDecoration: 'line-through', opacity: 0.5 } : {}}>
-            {commitment.title}
+    <article className={[
+      'commitment-card',
+      `state-${stateMeta.tone}`,
+      urgentPending ? 'urgent-pending' : '',
+    ].filter(Boolean).join(' ')}
+    >
+      <div className="card-main">
+        <div className="card-copy">
+          <div className="card-kicker">
+            <span className="peer-avatar">{peer.initials}</span>
+            <span>{isRequester ? `Assigned to ${peer.name}` : `Requested by ${peer.name}`}</span>
+            <span className="meta-divider">/</span>
+            <span>{commitment.id.slice(0, 8)}</span>
           </div>
-          <div className="card-meta" style={{ marginTop: 6 }}>
-            <div className="meta-item">
-              <div className="avatar av-blue">{peer.initials}</div>
-              <span>{peer.name}</span>
-            </div>
-            <div className="meta-item" style={overdue ? { color: '#fca5a5' } : {}}>
-              <span className="meta-icon">◷</span>
-              <span>{timeLabel(commitment.deadline)}</span>
-            </div>
-            {commitment.is_undeclared && (
-              <span className="soft-deadline-tag">
-                <span className="tag-dot" />
-                Soft deadline · 72h
-              </span>
-            )}
+          <h3>{commitment.title}</h3>
+          <div className="metadata-row">
+            <span className={isOverdue ? 'deadline overdue' : 'deadline'}>
+              {formatDeadline(commitment.deadline, commitment.is_undeclared)}
+            </span>
+            <span>{formatDate(commitment.deadline)}</span>
+            {commitment.is_undeclared && <span>Undeclared</span>}
           </div>
         </div>
-        <span className={`state-pill ${pill.cls}`}>{pill.label}</span>
+
+        <span className={`state-pill ${stateMeta.tone}`}>{stateMeta.label}</span>
       </div>
 
-      {/* Work note from assignee (shown in verifying state) */}
-      {commitment.state === 'verifying' && commitment.work_note && (
-        <div className="work-note-box">
-          <div className="work-note-label">WORK NOTE FROM ASSIGNEE</div>
-          <div className="work-note-text">{commitment.work_note}</div>
+      {commitment.work_note && (
+        <div className="note-panel">
+          <span>Work note</span>
+          <p>{commitment.work_note}</p>
         </div>
       )}
 
-      {/* Snooze reason (shown when snoozed) */}
       {commitment.state === 'snoozed' && commitment.snooze_reason && (
-        <div className="work-note-box" style={{ borderColor: 'rgba(245,158,11,0.2)' }}>
-          <div className="work-note-label">SNOOZE REASON</div>
-          <div className="work-note-text">{commitment.snooze_reason}</div>
+        <div className="note-panel snooze-note">
+          <span>Snooze reason</span>
+          <p>{commitment.snooze_reason}</p>
         </div>
       )}
 
-      {/* Actions — shown based on state + role */}
-      {commitment.state !== 'done' && (
+      {error && <div className="inline-error">{error}</div>}
+
+      {workNoteOpen && (
+        <form className="inline-action" onSubmit={submitWorkNote}>
+          <input
+            placeholder="Short note on what changed"
+            value={workNote}
+            onChange={(event) => setWorkNote(event.target.value)}
+          />
+          <button className="action-button primary" disabled={busy} type="submit">Submit</button>
+          <button className="action-button" disabled={busy} type="button" onClick={() => setWorkNoteOpen(false)}>
+            Cancel
+          </button>
+        </form>
+      )}
+
+      {snoozeOpen && (
+        <form className="inline-action" onSubmit={submitSnooze}>
+          <input
+            placeholder="Reason for snoozing"
+            value={snoozeReason}
+            onChange={(event) => setSnoozeReason(event.target.value)}
+          />
+          <button className="action-button warning" disabled={busy} type="submit">Snooze</button>
+          <button className="action-button" disabled={busy} type="button" onClick={() => setSnoozeOpen(false)}>
+            Cancel
+          </button>
+        </form>
+      )}
+
+      {isParticipant && commitment.state !== 'done' && (
         <div className="card-actions">
-
-          {/* ASSIGNEE: accept when pending */}
-          {commitment.state === 'pending' && isAssignee && (
-            <button className="btn btn-accept" onClick={() => transition('active')} disabled={loading}>
-              ✓ Accept
+          {isAssignee && commitment.state === 'pending' && (
+            <button className="action-button primary" disabled={busy} type="button" onClick={() => transition('active')}>
+              Accept
             </button>
           )}
 
-          {/* REQUESTER: nudge or withdraw when pending */}
-          {commitment.state === 'pending' && isRequester && (
+          {isAssignee && commitment.state === 'active' && !workNoteOpen && (
+            <button className="action-button primary" disabled={busy} type="button" onClick={() => setWorkNoteOpen(true)}>
+              Mark Done
+            </button>
+          )}
+
+          {isRequester && commitment.state === 'verifying' && (
             <>
-              <button className="btn" onClick={() => alert('Nudge sent!')} disabled={loading}>
-                ↑ Nudge
+              <button className="action-button primary" disabled={busy} type="button" onClick={() => transition('done')}>
+                Verify & Close
               </button>
-              <button className="btn btn-danger" onClick={() => alert('Withdrawn.')} disabled={loading}>
-                ✗ Withdraw
+              <button className="action-button danger" disabled={busy} type="button" onClick={() => transition('active')}>
+                Request Revision
               </button>
             </>
           )}
 
-          {/* ASSIGNEE: mark done when active */}
-          {commitment.state === 'active' && isAssignee && (
-            <>
-              {!workNoteOpen ? (
-                <button className="btn btn-verify" onClick={() => setWorkNoteOpen(true)} disabled={loading}>
-                  ✓ Mark Done
-                </button>
-              ) : (
-                <div className="inline-form">
-                  <input
-                    className="snooze-input"
-                    placeholder="Add a work note (optional)"
-                    value={workNote}
-                    onChange={(e) => setWorkNote(e.target.value)}
-                  />
-                  <button className="btn btn-verify" onClick={submitWorkNote} disabled={loading}>
-                    Confirm
-                  </button>
-                  <button className="btn" onClick={() => setWorkNoteOpen(false)}>
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </>
+          {['pending', 'active'].includes(commitment.state) && !snoozeOpen && (
+            <button className="action-button" disabled={busy} type="button" onClick={() => setSnoozeOpen(true)}>
+              Snooze
+            </button>
           )}
 
-          {/* REQUESTER: verify or request revision when verifying */}
-          {commitment.state === 'verifying' && isRequester && (
-            <>
-              <button className="btn btn-verify" onClick={() => transition('done')} disabled={loading}>
-                ✓ Verify & Close
-              </button>
-              <button className="btn btn-danger" onClick={() => transition('active')} disabled={loading}>
-                ✗ Request Revision
-              </button>
-            </>
-          )}
-
-          {/* EITHER: resume when snoozed */}
           {commitment.state === 'snoozed' && (
-            <button className="btn btn-accept" onClick={() => transition('active')} disabled={loading}>
-              ▶ Resume
+            <button className="action-button primary" disabled={busy} type="button" onClick={() => transition('active')}>
+              Resume
             </button>
-          )}
-
-          {/* Snooze (available in pending/active) */}
-          {['pending', 'active'].includes(commitment.state) && (
-            <div className="snooze-wrap">
-              <button className="btn" onClick={() => setSnoozeOpen((o) => !o)} disabled={loading}>
-                ⏸ Snooze
-              </button>
-              {snoozeOpen && (
-                <div className="snooze-dropdown">
-                  <div className="snooze-why">
-                    <input
-                      className="snooze-input"
-                      placeholder="Why? e.g. In a fire drill"
-                      value={snoozeReason}
-                      onChange={(e) => setSnoozeReason(e.target.value)}
-                    />
-                    <button
-                      className="btn btn-primary"
-                      style={{ width: '100%', marginTop: 6, justifyContent: 'center' }}
-                      onClick={submitSnooze}
-                      disabled={loading}
-                    >
-                      Confirm Snooze
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
           )}
         </div>
       )}
-    </div>
+    </article>
   )
 }

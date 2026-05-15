@@ -1,39 +1,62 @@
+const STATE_LABELS = {
+  pending: 'Pending',
+  active: 'Active',
+  verifying: 'Verifying',
+  done: 'Done',
+  snoozed: 'Snoozed',
+}
+
 function ageLabel(createdAt) {
-  const diff = Date.now() - new Date(createdAt)
-  const hours = Math.floor(diff / 3600000)
-  if (hours < 24) return `${hours}h`
-  return `${Math.floor(hours / 24)}d ${hours % 24}h`
+  if (!createdAt) return 'n/a'
+  const diffHours = Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 3600000))
+  if (diffHours < 1) return '<1h'
+  if (diffHours < 24) return `${diffHours}h`
+  return `${Math.floor(diffHours / 24)}d`
 }
 
-const STATE_COLOR = {
-  pending:   '#a1a1aa',
-  active:    '#93c5fd',
-  verifying: '#fcd34d',
-  done:      '#6ee7b7',
-  snoozed:   '#fcd34d',
+function peerNames(commitment, usersById, currentUserId) {
+  const requester = usersById[commitment.requester_id]?.name || commitment.requester_id
+  const assignee = usersById[commitment.assignee_id]?.name || commitment.assignee_id
+  const role = commitment.requester_id === currentUserId ? 'requested' : 'assigned'
+  return `${role} / ${requester} -> ${assignee}`
 }
 
-export default function Ledger({ commitments }) {
+export default function Ledger({ commitments, currentUserId, usersById }) {
   if (!commitments.length) {
-    return <div className="empty-state">No commitments in the ledger yet.</div>
+    return <div className="empty-panel">No ledger entries yet.</div>
   }
 
   return (
-    <div className="ledger">
-      <div className="ledger-header">
-        <span>Task</span>
-        <span>Status</span>
-        <span style={{ textAlign: 'right' }}>Age</span>
-      </div>
-      {commitments.map((c) => (
-        <div className="ledger-row" key={c.id}>
-          <div className="ledger-task">{c.title}</div>
-          <div className="ledger-status" style={{ color: STATE_COLOR[c.state] }}>
-            {c.state.charAt(0).toUpperCase() + c.state.slice(1)}
-          </div>
-          <div className="ledger-time">{ageLabel(c.created_at)}</div>
+    <div className="ledger-panel">
+      <div className="section-heading compact">
+        <div>
+          <h2>Ledger</h2>
+          <p>Full history for both sides of your handshakes.</p>
         </div>
-      ))}
+      </div>
+
+      <div className="ledger-table" role="table" aria-label="Commitment ledger">
+        <div className="ledger-row ledger-head" role="row">
+          <span role="columnheader">Task</span>
+          <span role="columnheader">Status</span>
+          <span role="columnheader">Age</span>
+        </div>
+
+        {commitments.map((commitment) => (
+          <div className="ledger-row" key={commitment.id} role="row">
+            <div className="ledger-task" role="cell">
+              <strong>{commitment.title}</strong>
+              <small>{peerNames(commitment, usersById, currentUserId)}</small>
+            </div>
+            <div role="cell">
+              <span className={`state-pill ${commitment.state}`}>
+                {STATE_LABELS[commitment.state] || commitment.state}
+              </span>
+            </div>
+            <span className="ledger-age" role="cell">{ageLabel(commitment.created_at)}</span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

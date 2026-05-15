@@ -1,10 +1,7 @@
 import axios from 'axios'
 
-// Hit the FastAPI backend directly on port 8000 (CORS is already enabled)
-const client = axios.create({ baseURL: 'http://localhost:8000' })
+const client = axios.create({ baseURL: '/api' })
 
-// Inject the current user header on every request
-// activeUserId is set by the user switcher in the UI
 let activeUserId = 'muzammil'
 
 export function setActiveUser(userId) {
@@ -16,24 +13,13 @@ client.interceptors.request.use((config) => {
   return config
 })
 
-// --- API functions ---
+const unwrap = (request) => request.then((response) => response.data)
 
 export const api = {
-  getUsers: () =>
-    client.get('/users').then((r) => r.data),
-
-  getMine: () =>
-    client.get('/commitments/mine').then((r) => r.data),
-
-  getIncoming: () =>
-    client.get('/commitments/incoming').then((r) => r.data),
-
-  getLedger: () =>
-    client.get('/commitments/ledger').then((r) => r.data),
-
-  createCommitment: (payload) =>
-    client.post('/commitments', payload).then((r) => r.data),
-
-  updateCommitment: (id, payload) =>
-    client.patch(`/commitments/${id}`, payload).then((r) => r.data),
+  getUsers: () => unwrap(client.get('/users')),
+  getMine: () => unwrap(client.get('/commitments/mine')),
+  getIncoming: () => unwrap(client.get('/commitments/incoming')),
+  getLedger: () => unwrap(client.get('/commitments/ledger')),
+  createCommitment: (payload) => unwrap(client.post('/commitments', payload)),
+  updateCommitment: (id, payload) => unwrap(client.patch(`/commitments/${id}`, payload)),
 }

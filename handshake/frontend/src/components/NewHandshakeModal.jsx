@@ -1,117 +1,116 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { api } from '../api'
 
-export default function NewHandshakeModal({ users, currentUserId, onClose, onCreate }) {
+function localDateTimePlusHours(hours) {
+  const date = new Date(Date.now() + hours * 3600000)
+  date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  return date.toISOString().slice(0, 16)
+}
+
+export default function NewHandshakeModal({ currentUserId, onClose, onCreate, users }) {
+  const assignees = useMemo(() => users.filter((user) => user.id !== currentUserId), [currentUserId, users])
   const [title, setTitle] = useState('')
-  const [assigneeId, setAssigneeId] = useState(() => {
-    // Default to first user that isn't the current user
-    const others = users.filter((u) => u.id !== currentUserId)
-    return others[0]?.id || ''
-  })
-  const [deadline, setDeadline] = useState('')
+  const [assigneeId, setAssigneeId] = useState(assignees[0]?.id || '')
+  const [deadline, setDeadline] = useState(localDateTimePlusHours(24))
   const [isUndeclared, setIsUndeclared] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const otherUsers = users.filter((u) => u.id !== currentUserId)
+  async function handleSubmit(event) {
+    event.preventDefault()
 
-  async function handleSubmit() {
     if (!title.trim()) {
-      setError('Commitment title is required')
+      setError('Give the handshake a clear title.')
       return
     }
+
+    if (!assigneeId) {
+      setError('Choose a teammate.')
+      return
+    }
+
     setLoading(true)
     setError('')
+
     try {
-      const payload = {
+      const created = await api.createCommitment({
         title: title.trim(),
         assignee_id: assigneeId,
+        deadline: isUndeclared ? null : new Date(deadline).toISOString(),
         is_undeclared: isUndeclared,
-        deadline: isUndeclared || !deadline ? null : new Date(deadline).toISOString(),
-      }
-      const created = await api.createCommitment(payload)
+      })
       onCreate(created)
       onClose()
-    } catch (e) {
-      setError(e.response?.data?.detail || 'Something went wrong')
+    } catch (requestError) {
+      setError(requestError.response?.data?.detail || 'Could not create handshake.')
     } finally {
       setLoading(false)
     }
   }
 
+  function toggleUndeclared() {
+    setIsUndeclared((value) => !value)
+  }
+
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-title">🤝 New Handshake</div>
-        <div className="modal-sub">Create an accountability commitment with a teammate</div>
-
-        {error && (
-          <div style={{ color: '#fca5a5', fontSize: 11, marginBottom: 10 }}>{error}</div>
-        )}
-
-        <div className="field-label">Commitment</div>
-        <input
-          className="field-input"
-          placeholder="What are you committing to?"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          autoFocus
-        />
-
-        <div className="field-label">Assignee</div>
-        <select
-          className="field-input"
-          value={assigneeId}
-          onChange={(e) => setAssigneeId(e.target.value)}
-        >
-          {otherUsers.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="field-label">Deadline</div>
-        <div className="field-row">
-          <input
-            className="field-input"
-            type="datetime-local"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            disabled={isUndeclared}
-            style={{ flex: 1, marginBottom: 0 }}
-          />
-          <button
-            className={`deadline-toggle ${isUndeclared ? 'active' : ''}`}
-            onClick={() => {
-              setIsUndeclared((v) => !v)
-              if (!isUndeclared) setDeadline('')
-            }}
-          >
-            Undeclared
-          </button>
+    <div className="modal-backdrop" onMouseDown={onClose}>
+      <form className="handshake-modal" onMouseDown={(event) => event.stopPropagation()} onSubmit={handleSubmit}>
+        <div className="modal-header">
+          <div>
+            <h2>New Handshake</h2>
+            <p>Make the ask explicit, then track the agreement.</p>
+          </div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Close">×</button>
         </div>
 
-        {isUndeclared && (
-          <div style={{ marginBottom: 12 }}>
-            <span className="soft-deadline-tag">
-              <span className="tag-dot" />
-              Soft deadline of 72h will be auto-applied
-            </span>
-          </div>
-        )}
+        {error && <div className="notice error">{error}</div>}
 
-        <button className="btn-send" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Sending…' : 'Send Handshake →'}
-        </button>
-        <button
-          className="btn"
-          style={{ width: '100%', justifyContent: 'center', marginTop: 7 }}
-          onClick={onClose}
-        >
-          Cancel
-        </button>
-      </div>
+        <label className="field-stack">
+          <span>Title</span>
+          <input
+            autoFocus
+            placeholder="Refactor auth middleware"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+        </label>
+
+        <label className="field-stack">
+          <span>Assignee</span>
+          <select value={assigneeId} onChange={(event) => setAssigneeId(event.target.value)}>
+            {assignees.map((user) => (
+              <option key={user.id} value={user.id}>{user.name}</option>
+            ))}
+          </select>
+        </label>
+
+        <div className="field-stack">
+          <span>Deadline</span>
+          <div className="deadline-row">
+            <input
+              disabled={isUndeclared}
+              type="datetime-local"
+              value={deadline}
+              onChange={(event) => setDeadline(event.target.value)}
+            />
+            <button
+              className={isUndeclared ? 'toggle-pill active' : 'toggle-pill'}
+              type="button"
+              onClick={toggleUndeclared}
+            >
+              Undeclared
+            </button>
+          </div>
+          {isUndeclared && <small>Soft 72h deadline. No hard due date is sent.</small>}
+        </div>
+
+        <div className="modal-actions">
+          <button className="action-button" type="button" onClick={onClose}>Cancel</button>
+          <button className="action-button primary" disabled={loading} type="submit">
+            {loading ? 'Sending...' : 'Send Handshake'}
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
