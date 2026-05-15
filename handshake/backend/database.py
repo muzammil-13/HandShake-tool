@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from models import Base
+from sqlalchemy.orm import sessionmaker, declarative_base
+#from models import Base
 
 # Database configuration
 SQLALCHEMY_DATABASE_URL = "sqlite:///./handshake.db"
@@ -11,6 +11,9 @@ engine = create_engine(
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base should be defined here!
+Base = declarative_base() 
 
 def get_db():
     db = SessionLocal()

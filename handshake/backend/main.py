@@ -1,4 +1,9 @@
-from fastapi import FastAPI, Depends, HTTPException, Header
+import logging
+import os
+import sys
+from loguru import logger
+
+from fastapi import FastAPI, Depends, HTTPException, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -8,7 +13,43 @@ from database import engine, get_db
 # Create tables on startup
 models.Base.metadata.create_all(bind=engine)
 
+# Logging configuration
+LOG_DIR = os.path.join(os.path.dirname(__file__), "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+LOG_FILE = os.path.join(LOG_DIR, "handshake_backend.log")
+
+# Configure Loguru
+logger.remove()  # Remove default stdout handler
+logger.add(sys.stdout, colorize=True, format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>")
+logger.add(LOG_FILE, rotation="10 MB", format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}", level="INFO", enqueue=True)
+
+class InterceptHandler(logging.Handler):
+    """Intercept standard logging messages and route them to Loguru."""
+    def emit(self, record):
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
+        logger.opt(exception=record.exc_info).log(level, record.getMessage())
+
 app = FastAPI(title="Handshake API")
+
+@app.on_event("startup")
+def startup_event():
+    # Route uvicorn and fastapi terminal logs to Loguru here,
+    # after Uvicorn has finished its internal logging setup.
+    for logger_name in ("uvicorn", "uvicorn.error", "uvicorn.access", "fastapi"):
+        logging_logger = logging.getLogger(logger_name)
+        logging_logger.handlers = [InterceptHandler()]
+        logging_logger.propagate = False
+    logger.info("Handshake backend startup")
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Incoming request {request.method} {request.url.path}")
+    response = await call_next(request)
+    logger.info(f"Completed {request.method} {request.url.path} with {response.status_code}")
+    return response
 
 # Allow the React dev server to talk to us
 app.add_middleware(

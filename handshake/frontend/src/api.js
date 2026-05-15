@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// All requests go through the Vite proxy → FastAPI at localhost:8000
-const client = axios.create({ baseURL: '/api' })
+// Hit the FastAPI backend directly on port 8000 (CORS is already enabled)
+const client = axios.create({ baseURL: 'http://localhost:8000' })
 
 // Inject the current user header on every request
 // activeUserId is set by the user switcher in the UI
