@@ -180,3 +180,43 @@ asyncio.exceptions.CancelledError
 
 2026-05-15 11:39:02 | INFO     | Handshake backend startup
 2026-05-15 11:39:02 | INFO     | Application startup complete.
+2026-05-15 11:51:18 | INFO     | Handshake backend startup
+2026-05-15 11:51:18 | INFO     | Application startup complete.
+2026-05-15 11:54:48 | INFO     | Handshake backend startup
+2026-05-15 11:54:48 | INFO     | Application startup complete.
+2026-05-15 11:54:56 | INFO     | Incoming request GET /
+2026-05-15 11:54:56 | INFO     | Completed GET / with 404
+2026-05-15 11:54:56 | INFO     | 127.0.0.1:52009 - "GET / HTTP/1.1" 404
+2026-05-15 11:54:58 | INFO     | Incoming request GET /favicon.ico
+2026-05-15 11:54:58 | INFO     | Completed GET /favicon.ico with 404
+2026-05-15 11:54:58 | INFO     | 127.0.0.1:52009 - "GET /favicon.ico HTTP/1.1" 404
+2026-05-15 11:55:02 | INFO     | Incoming request GET /docs
+2026-05-15 11:55:02 | INFO     | Completed GET /docs with 200
+2026-05-15 11:55:02 | INFO     | 127.0.0.1:52009 - "GET /docs HTTP/1.1" 200
+2026-05-15 11:55:02 | INFO     | Incoming request GET /openapi.json
+2026-05-15 11:55:02 | INFO     | Completed GET /openapi.json with 200
+2026-05-15 11:55:02 | INFO     | 127.0.0.1:52009 - "GET /openapi.json HTTP/1.1" 200
+2026-05-15 11:55:08 | INFO     | Incoming request GET /users
+2026-05-15 11:55:08 | INFO     | Incoming request GET /commitments/mine
+2026-05-15 11:55:08 | INFO     | Incoming request GET /commitments/incoming
+2026-05-15 11:55:08 | INFO     | Incoming request GET /commitments/ledger
+2026-05-15 11:55:08 | INFO     | Completed GET /users with 200
+2026-05-15 11:55:08 | INFO     | 127.0.0.1:49888 - "GET /users HTTP/1.1" 200
+2026-05-15 11:55:08 | INFO     | Completed GET /commitments/incoming with 200
+2026-05-15 11:55:08 | INFO     | Completed GET /commitments/mine with 200
+2026-05-15 11:55:08 | INFO     | 127.0.0.1:49890 - "GET /commitments/incoming HTTP/1.1" 200
+2026-05-15 11:55:08 | INFO     | 127.0.0.1:49889 - "GET /commitments/mine HTTP/1.1" 200
+2026-05-15 11:55:08 | INFO     | Completed GET /commitments/ledger with 200
+2026-05-15 11:55:08 | INFO     | 127.0.0.1:49891 - "GET /commitments/ledger HTTP/1.1" 200
+2026-05-15 11:55:09 | INFO     | Incoming request GET /users
+2026-05-15 11:55:09 | INFO     | Completed GET /users with 200
+2026-05-15 11:55:09 | INFO     | 127.0.0.1:60170 - "GET /users HTTP/1.1" 200
+2026-05-15 11:55:09 | INFO     | Incoming request GET /commitments/incoming
+2026-05-15 11:55:09 | INFO     | Incoming request GET /commitments/mine
+2026-05-15 11:55:09 | INFO     | Incoming request GET /commitments/ledger
+2026-05-15 11:55:09 | INFO     | Completed GET /commitments/incoming with 200
+2026-05-15 11:55:09 | INFO     | Completed GET /commitments/ledger with 200
+2026-05-15 11:55:09 | INFO     | 127.0.0.1:50739 - "GET /commitments/incoming HTTP/1.1" 200
+2026-05-15 11:55:09 | INFO     | 127.0.0.1:50741 - "GET /commitments/ledger HTTP/1.1" 200
+2026-05-15 11:55:09 | INFO     | Completed GET /commitments/mine with 200
+2026-05-15 11:55:09 | INFO     | 127.0.0.1:50740 - "GET /commitments/mine HTTP/1.1" 200

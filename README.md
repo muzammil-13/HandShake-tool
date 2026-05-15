@@ -89,10 +89,17 @@ A commitment only exists when it’s mutually accepted.
 *Developer Preview*
 
 1. Clone the repository
-2. Run `npm install` and `npm run build`
-3. Open `chrome://extensions`
-4. Enable **Developer Mode**
-5. Click **Load Unpacked** → select `dist`
+2. From the repo root, run `run_handshake.cmd`
+   - this installs backend and frontend dependencies
+   - starts the backend on `uvicorn main:app --reload`
+   - starts the frontend with `npm run dev`
+3. Open `http://localhost:5173` in your browser
+
+> If you prefer manual startup, use the backend and frontend folders separately:
+> - `cd handshake/backend && .venv\Scripts\activate.bat && pip install -r requirements.txt && uvicorn main:app --reload`
+> - `cd handshake/frontend && npm install && npm run dev`
+
+---
 
 ---
 
